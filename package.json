@@ -1,0 +1,9 @@
+{
+  "name": "kaillois-playground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "카이와 놀이터 - 점수 저장용 Netlify 함수",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9"
+  }
+}
