@@ -109,6 +109,18 @@ textarea{font-size:14px;min-height:120px}
 .box.chosen{font-size:26px;background:var(--panel);color:var(--ink)}
 .box.gold{background:var(--gold);color:var(--ink)}
 .box.dbl{background:var(--t-mimicry);color:var(--ink)}
+.dice{display:flex;gap:22px;justify-content:center;margin:6px 0}
+.die{width:92px;height:92px;background:#fff;color:#000;box-shadow:var(--frame),var(--bevel);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:12px;margin:4px}
+.pip{display:block;width:100%;height:100%}
+.pip.on{background:#000;transform:scale(.8)}
+.cupsrow{position:relative;height:190px;margin:4px;background:var(--tint);box-shadow:var(--frame);overflow:hidden}
+.cup{position:absolute;top:44px;width:31%;height:120px;padding:0;border:0;background:none;cursor:pointer}
+.cup:disabled{cursor:default}
+.cupimg{position:absolute;inset:0;transition:transform .3s}
+.cupimg .spr{width:100%;height:100%}
+.cup.lift .cupimg{transform:translateY(-56px)}
+.gem{position:absolute;bottom:4px;left:50%;width:44px;transform:translateX(-50%)}
+.gem .spr{width:100%;height:auto}
 .banner{background:var(--tint);color:var(--ink);margin:4px;padding:8px 12px;text-align:center;font-weight:700;box-shadow:var(--frame)}
 .term{background:#050A14;color:#8DFFB9;margin:4px;padding:14px;font:500 16px/1.65 var(--f-body);display:flex;flex-direction:column;gap:8px;box-shadow:var(--frame),0 0 0 8px var(--soft)}
 .term p{margin:0}
@@ -233,19 +245,22 @@ var SWORD=['...s...','..sws..','..sws..','..sws..','..sws..','..sws..','.kkkkk.'
 var BALLOON=['..rrrr..','.rwwrrr.','rrwrrrrr','rrwrrrrr','rrrrrrrr','rrrrrrrr','.rrrrrr.','..rrrr..','...rr...','....k...'];
 var HERO_ROUND=['...HHHH...','..HHHHHH..','.HHHHHHHH.','.HttttttH.','.HtkttktH.','..tttttt..','..BBBBBB..','.CCCBBCCC.','.CCCCCCCC.','.CC....CC.'];
 var HERO_POINTY=['....HH....','...HHHH...','..HHHHHH..','.HHHHHHHH.','HHHHHHHHHH','..tttttt..','..tktktt..','..tttttt..','..BBBBBB..','.CCCCCCCC.'];
+var ROCK=['..kkkkk..','.knnsnnk.','knsnnnnnk','knnnrnsnk','knnnnnnnk','knsnnnnnk','.knnnnnk.','..kkkkk..'];
+var CUP=['..kkkkkk..','.kbbbbbbk.','.kbwbbbbk.','kbbwbbbbbk','kbbbbbbbbk','kbbbbbbbbk','kbbbbbbbbk','kkkkkkkkkk'];
+var GEM=['..rr..','.rwrr.','rrrrrr','.rrrr.','..rr..'];
 var ROUND_ICONS=[spr(STAR,null,8),spr(CHEST,null,8),spr(SWORD,null,8),spr(BALLOON,null,8)];
 
 /* ---------- 데이터 ---------- */
 var EL=[
   {key:'agon',name:'경쟁 요소',game:'별똥별 잡기',desc:'실력과 노력으로 겨루는 재미'},
-  {key:'alea',name:'확률 요소',game:'행운 상자',desc:'운에 맡기는 두근두근'},
+  {key:'alea',name:'확률 요소',game:'행운 뽑기',desc:'운에 맡기는 두근두근'},
   {key:'mimicry',name:'역할 요소',game:'던전 글자 모험',desc:'다른 직업이 되어 모험하는 재미'},
   {key:'ilinx',name:'스릴 요소',game:'풍선 버티기',desc:'아슬아슬하고 짜릿한 느낌'}
 ];
 
 var ROUNDS=[
-  {title:'별똥별 잡기',rules:['30초 동안 별이 계속 나타나요','별을 연속으로 잡으면 콤보! 한 개마다 점수가 더 올라가요','반짝이는 주황 황금 별은 20점이에요'],note:'빠른 손가락과 집중력이 필요해요!',play:playStar},
-  {title:'행운 상자',rules:['상자 3개 중 하나를 골라요','숫자, 황금 카드, 더블 카드가 숨어 있어요','모두 6번 골라요'],note:'어떤 상자가 좋을지는 아무도 몰라요. 열어 봐야 알아요!',play:playBox},
+  {title:'별똥별 잡기',rules:['30초 동안 별이 계속 나타나요','별을 연속으로 잡으면 콤보! 한 개마다 점수가 더 올라가요','반짝이는 주황 황금 별은 20점! 검은 운석은 피해요. 누르면 -15점에 콤보가 끊겨요','시간이 갈수록 별이 빨리 사라지고 작아져요'],note:'빠른 손가락과 집중력이 필요해요!',play:playStar},
+  {title:'행운 뽑기',rules:['상자, 주사위, 컵 보석 찾기 세 가지 놀이를 두 번씩, 모두 6번 해요','상자에는 숫자·황금·더블 카드가 숨어 있어요. 더블 카드를 뽑으면 다음 놀이 점수가 2배!','주사위는 합×4점에 같은 눈 보너스, 컵 놀이는 보석이 숨은 컵을 맞히면 점수예요'],note:'어떤 게 좋을지는 열어 봐야 알아요. 컵 놀이는 눈이 좋으면 조금 더 유리할지도 몰라요!',play:playLuck},
   {title:'던전 글자 모험',rules:['직업을 하나 골라요: 전사, 마법사, 드워프, 엘프, 도적, 성직자','던전에서 6번 위기를 만나요. 행동을 하나씩 골라요','상황 속 단서를 잘 읽고, 내 직업에 어울리는 행동을 골라야 높은 점수예요'],note:'직업의 능력은 알려 주지 않아요. 설명을 잘 읽고 신중하게 정해요. 옛날 컴퓨터 통신 시절의 글자 게임이에요.',play:playRole},
   {title:'풍선 버티기',rules:['풍선을 꾸욱 누르고 있으면 점점 커지고 점수가 쌓여요','손을 떼는 순간, 그때까지 쌓인 점수를 저금해요','너무 오래 누르면 펑! 그 풍선은 0점이에요. 풍선은 5개예요'],note:'언제 손을 뗄지는 내 감으로 정해요!',play:playBalloon}
 ];
@@ -357,24 +372,32 @@ function playStar(){
     var count=0,score=0,combo=0,end=performance.now()+DUR,over=false;
     function hud(){scEl.textContent=score;cbEl.textContent=combo>=2?'콤보 x'+combo:'';}
     function floater(x,y,txt){var f=document.createElement('span');f.className='floater';f.textContent=txt;f.style.left=x+'px';f.style.top=y+'px';area.appendChild(f);T(function(){f.remove();},650);}
-    function spawn(){
-      if(over||end-performance.now()<800)return;
-      spawned++;
-      var gold=Math.random()<0.12,s=gold?76:rnd(52,68),life=gold?950:1100;
-      var b=document.createElement('button');b.type='button';b.className='star';b.setAttribute('aria-label',gold?'황금 별':'별');
-      b.innerHTML=spr(STAR,gold?{y:'#FFA300'}:null);
+    function make(p){
+      var meteor=p>0.1&&Math.random()<0.2;
+      if(!meteor)spawned++;
+      var gold=!meteor&&Math.random()<0.12,k=1-p*0.3;
+      var s=Math.round((gold?70:(meteor?64:rnd(50,64)))*k),life=Math.round(gold?850:(meteor?1500:1100-p*400));
+      var b=document.createElement('button');b.type='button';b.className='star';b.setAttribute('aria-label',meteor?'운석':(gold?'황금 별':'별'));
+      b.innerHTML=spr(meteor?ROCK:STAR,gold?{y:'#FFA300'}:null);
       var w=Math.max(area.clientWidth-s,1),h=Math.max(area.clientHeight-s,1),x=Math.random()*w,y=Math.random()*h;
       b.style.width=s+'px';b.style.height=s+'px';b.style.left=x+'px';b.style.top=y+'px';b.style.animationDuration=life+'ms';
       function hit(ev){
         if(ev)ev.preventDefault();if(b.dataset.done||over)return;b.dataset.done='1';
+        if(meteor){combo=0;score=Math.max(0,score-15);hud();floater(x,y,'-15');b.classList.add('caught');T(function(){b.remove();},220);return;}
         combo++;if(combo>bestCombo)bestCombo=combo;count++;
-        var p=gold?20:5+Math.min(combo,5);score+=p;hud();floater(x,y,'+'+p);
+        var pt=gold?20:5+Math.min(combo,8);score+=pt;hud();floater(x,y,'+'+pt);
         b.classList.add('caught');T(function(){b.remove();},220);
       }
       b.addEventListener('pointerdown',hit);b.addEventListener('click',hit);
       area.appendChild(b);
-      T(function(){if(!b.dataset.done){b.dataset.done='1';combo=0;hud();b.remove();}},life);
-      T(spawn,rnd(420,760));
+      T(function(){if(!b.dataset.done){b.dataset.done='1';if(!meteor){combo=0;hud();}b.remove();}},life);
+    }
+    function spawn(){
+      if(over||end-performance.now()<800)return;
+      var p=1-(end-performance.now())/DUR;
+      make(p);
+      if(p>0.5&&Math.random()<0.3)make(p);
+      T(spawn,Math.round(rnd(380,700)*(1-p*0.45)));
     }
     hud();spawn();
     var tick=I(function(){
@@ -389,17 +412,26 @@ function playStar(){
   turnIntro();
 }
 
-/* ---------- 라운드 2: 행운 상자 ---------- */
+/* ---------- 라운드 2: 행운 뽑기 (상자 · 주사위 · 컵 보석) ---------- */
 var TABLE=[[0,.12],[10,.18],[20,.22],[30,.18],[40,.12],[60,.06],[100,.04],['x2',.08]];
 function draw(){var r=Math.random(),a=0;for(var i=0;i<TABLE.length;i++){a+=TABLE[i][1];if(r<a)return TABLE[i][0];}return 20;}
 function boxLabel(v){return v==='x2'?'더블 ×2':(v===100?'황금 +100':'+'+v);}
-function playBox(){
-  var TURNS=6,n=0,total=0,mult=1;
-  function turn(){
-    clearAll();
-    main.innerHTML='<div class="hud"><span class="player-badge">행운</span><span>'+(n+1)+' / '+TURNS+'번째</span><span class="total">합계 '+total+'</span></div>'+
-     (mult===2?'<div class="banner">더블 찬스! 이번 선택은 점수가 2배예요</div>':'')+
-     '<h2>상자를 하나 골라요</h2>'+
+var PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function die(n){var s='';for(var i=0;i<9;i++)s+='<i class="pip'+(PIPS[n].indexOf(i)>=0?' on':'')+'"></i>';return '<div class="die" aria-label="주사위 '+n+'">'+s+'</div>';}
+var SEQ=['box','dice','cups','box','dice','cups'];
+function playLuck(){
+  var N=SEQ.length,n=0,total=0,mult=1;
+  function bank(g){var was=mult,v=g*mult;total+=v;mult=1;return {v:v,dbl:was===2};}
+  function head(title){return '<div class="hud"><span class="player-badge">'+title+'</span><span>'+(n+1)+' / '+N+'</span><span class="total">합계 '+total+'</span></div>'+
+    (mult===2?'<div class="banner">더블 찬스! 이번 점수가 2배예요</div>':'');}
+  function done(msg){
+    $('#msg').textContent=msg;
+    $('#act').innerHTML='<button class="btn big" id="nx" type="button">'+(n+1>=N?'결과 보기':'다음 놀이')+'</button>';
+    $('#nx').onclick=function(){n++;if(n>=N)finishRound(1,total,'상자·주사위·컵 게임으로 모은 점수예요.');else turn();};
+  }
+  function turn(){clearAll();var g=SEQ[n];if(g==='box')box();else if(g==='dice')dice();else cups();}
+  function box(){
+    main.innerHTML=head('행운 상자')+'<h2>상자를 하나 골라요</h2>'+
      '<div class="boxes">'+[0,1,2].map(function(i){return '<button class="box" type="button" data-i="'+i+'" aria-label="상자 '+(i+1)+'">'+spr(CHEST)+'</button>';}).join('')+'</div>'+
      '<p class="msg" id="msg" aria-live="polite"></p><div id="act"></div>';
     $$('.box').forEach(function(b){b.onclick=function(){pick(+b.dataset.i);};});
@@ -407,27 +439,70 @@ function playBox(){
   function pick(i){
     var vals=[draw(),draw(),draw()],boxes=$$('.box');
     boxes.forEach(function(b){b.disabled=true;});
-    boxes[i].classList.add('shake');
-    $('#msg').textContent='두근두근…';
+    boxes[i].classList.add('shake');$('#msg').textContent='두근두근…';
     T(function(){
       boxes.forEach(function(b,k){
         b.classList.add(k===i?'chosen':'other');b.textContent=boxLabel(vals[k]);
         if(vals[k]===100)b.classList.add('gold');
         if(vals[k]==='x2')b.classList.add('dbl');
       });
-      var v=vals[i],m=$('#msg'),num=function(x){return x==='x2'?0:x;},best=Math.max(num(vals[0]),num(vals[1]),num(vals[2]));
-      n++;
-      if(v==='x2'){
-        if(n>=TURNS){total+=40;m.textContent='마지막 더블 카드는 보너스 +40점으로 바뀌었어요!';}
-        else{mult=2;m.textContent='더블 카드! 다음 선택은 점수가 2배예요!';}
-      }else{
-        var gain=v*mult;total+=gain;
-        m.textContent=(mult===2?'더블 적용! +'+gain+'점! ':'')+(v===100?'황금 카드! 대박이에요!':(num(v)===best&&v>0?'가장 좋은 상자를 골랐어요!':(v===0?'아쉬워요, 0점이에요.':'다른 상자가 더 컸어요. 운이에요!')));
-        mult=1;
-      }
-      $('#act').innerHTML='<button class="btn big" id="nx" type="button">'+(n>=TURNS?'결과 보기':'다음 상자')+'</button>';
-      $('#nx').onclick=function(){if(n>=TURNS)finishRound(1,total,'여섯 번 열어서 모은 점수예요.');else turn();};
+      var v=vals[i],num=function(x){return x==='x2'?0:x;},best=Math.max(num(vals[0]),num(vals[1]),num(vals[2]));
+      if(v==='x2'){mult=2;done('더블 카드! 다음 놀이 점수가 2배예요!');return;}
+      var b=bank(v);
+      done((b.dbl?'더블 적용! ':'')+'+'+b.v+'점! '+(v===100?'황금 카드! 대박이에요!':(v===0?'아쉬워요, 0점이에요.':(v===best?'가장 좋은 상자를 골랐어요!':'다른 상자가 더 컸어요. 운이에요!'))));
     },reduced?0:750);
+  }
+  function dice(){
+    main.innerHTML=head('주사위')+'<h2>주사위 2개를 굴려요</h2>'+
+     '<p class="meta center" style="color:var(--soft)">합 × 4점! 같은 눈이 나오면 +20점. 마음에 안 들면 한 번 더 굴릴 수 있지만, 두 번째 결과를 꼭 써야 해요.</p>'+
+     '<div class="dice" id="dice">'+die(1)+die(1)+'</div><p class="msg" id="msg" aria-live="polite"></p>'+
+     '<div id="act"><button class="btn big" id="roll" type="button">주사위 굴리기</button></div>';
+    var tries=0;
+    function show(a,b){$('#dice').innerHTML=die(a)+die(b);}
+    function roll(){
+      tries++;$('#act').innerHTML='';$('#msg').textContent='데구르르…';
+      var t=0,id=I(function(){show(rnd(1,6),rnd(1,6));t++;if(t>=10){clearInterval(id);settle();}},90);
+    }
+    function settle(){
+      var a=rnd(1,6),b=rnd(1,6),pts=(a+b)*4+(a===b?20:0);show(a,b);
+      var line='합 '+(a+b)+(a===b?' · 같은 눈!':'')+' → '+pts+'점';
+      function keep(){var r=bank(pts);done((r.dbl?'더블 적용! ':'')+line.replace(pts+'점',r.v+'점')+(pts>=50?' 대박!':''));}
+      if(tries>=2){keep();return;}
+      $('#msg').textContent=line;
+      $('#act').innerHTML='<button class="btn big" id="keep" type="button">이 점수로 확정</button><button class="btn ghost big" id="again" type="button">한 번 더 굴리기 (결과를 꼭 써야 해요)</button>';
+      $('#keep').onclick=keep;$('#again').onclick=roll;
+    }
+    $('#roll').onclick=roll;
+  }
+  function cups(){
+    var lvl=n<3?0:1,swaps=lvl?10:6,gap=lvl?260:480,pts=lvl?60:40,gem=rnd(0,2),pos=[0,1,2];
+    main.innerHTML=head('컵 보석 찾기')+'<h2>보석은 어느 컵 아래에 있을까요?</h2>'+
+     '<div class="cupsrow" id="cr">'+[0,1,2].map(function(i){
+       return '<button class="cup" type="button" data-i="'+i+'" disabled aria-label="컵 '+(i+1)+'" style="left:'+(i*33.3+1.5)+'%;transition:left '+Math.round(gap*0.8)+'ms ease-in-out">'+
+         (i===gem?'<span class="gem">'+spr(GEM)+'</span>':'')+'<span class="cupimg">'+spr(CUP)+'</span></button>';}).join('')+'</div>'+
+     '<p class="msg" id="msg" aria-live="polite">보석을 잘 봐요!</p><div id="act"></div>';
+    var cs=$$('.cup');
+    T(function(){cs[gem].classList.add('lift');},500);
+    T(function(){
+      cs[gem].classList.remove('lift');$('#msg').textContent='섞는 중… 눈을 떼지 마요!';
+      var k=0;
+      var id=I(function(){
+        var a=rnd(0,2),b=(a+rnd(1,2))%3;
+        var ca=pos.indexOf(a),cb=pos.indexOf(b);pos[ca]=b;pos[cb]=a;
+        cs[ca].style.left=(b*33.3+1.5)+'%';cs[cb].style.left=(a*33.3+1.5)+'%';
+        k++;if(k>=swaps){clearInterval(id);T(ask,gap);}
+      },gap);
+    },1900);
+    function ask(){
+      $('#msg').textContent='보석이 있는 컵을 골라요!';
+      cs.forEach(function(c){c.disabled=false;c.onclick=function(){reveal(+c.dataset.i);};});
+    }
+    function reveal(i){
+      cs.forEach(function(c){c.disabled=true;});
+      cs[gem].classList.add('lift');if(i!==gem)cs[i].classList.add('lift');
+      if(i===gem){var r=bank(pts);done((r.dbl?'더블 적용! ':'')+'찾았어요! +'+r.v+'점!');}
+      else{mult=1;done('아쉬워요! 보석은 다른 컵 아래 있었어요. 0점이에요.');}
+    }
   }
   turn();
 }
@@ -662,7 +737,7 @@ function teacher(){
     '<div id="board"></div><div id="awards"></div>'+
     '<div class="card"><h3>토론 질문</h3><ol class="talk">'+
      '<li>1위 학생은 모든 요소에서 1등이었나요? 어떤 요소가 순위를 바꿨을까요?</li>'+
-     '<li>행운 상자 점수가 높은 사람은 정말 \'잘한\' 걸까요? 경쟁 요소와 무엇이 다른가요?</li>'+
+     '<li>행운 뽑기 점수가 높은 사람은 정말 \'잘한\' 걸까요? 경쟁 요소와 무엇이 다른가요?</li>'+
      '<li>같은 상황에서 직업에 따라 점수가 달랐던 이유는 무엇일까요? 게임 속 역할과 진짜 나는 어떻게 닮고 다른가요?</li>'+
      '<li>풍선을 일찍 저금한 사람과 끝까지 누른 사람은 어떤 마음이었나요? 게임을 멈추기 어려운 순간과 닮은 점은 무엇인가요?</li></ol></div>'+
    '</section></div>';
