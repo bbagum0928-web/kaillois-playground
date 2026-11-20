@@ -311,14 +311,13 @@ function start(){
    '<div class="logo">'+spr(STAR,null,6)+spr(CHEST,null,6)+spr(SWORD,null,6)+spr(BALLOON,null,6)+'</div>'+
    '<div><h1>카이와 놀이터</h1></div>'+
    '<p class="press">PRESS START</p>'+
-   '<p class="lead">혼자서 4가지 놀이에 도전해요. 점수가 가장 높은 사람이 이겨요!</p>'+
+   '<p class="lead">로제 카이와의 놀이의 요소를 게임으로 체험해봐요!</p>'+
    '<div class="card">'+
      '<label for="tn">별명 <small>(진짜 이름 대신 별명을 써요)</small></label>'+
      '<div class="inline"><input id="tn" maxlength="10" autocomplete="off" value="'+esc(S.team.name)+'"><button class="btn ghost sm" id="dice" type="button">다시 뽑기</button></div>'+
      '<label for="rc">수업 코드 <small>(선생님이 알려 줘요)</small></label><input id="rc" maxlength="8" autocomplete="off" autocapitalize="characters" value="'+esc(S.room)+'" placeholder="예: AB7K">'+
    '</div>'+
    '<button class="btn big" id="go" type="button">▶ 놀이 시작</button>'+
-   '<p class="meta center">내 폰으로 혼자 해요.</p>'+
    '<button class="link" id="tch" type="button">선생님 화면</button>';
   $('#dice').onclick=function(){$('#tn').value=randName();};
   $('#rc').addEventListener('input',function(){this.value=cleanRoom(this.value);});
